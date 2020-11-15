@@ -1,0 +1,28 @@
+{
+  "@@locale":"en_US",
+  "@@last_modified": "2019-07-26T05:40:50.486654",
+  "title": "Daily Coding",
+  "@title": {
+    "description": "Title for the Xld application",
+    "type": "text",
+    "placeholders": {}
+  },
+  "about": "About",
+  "@about": {
+    "description": "Label for the About tab",
+    "type": "text",
+    "placeholders": {}
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Label for the Settings tab",
+    "type": "text",
+    "placeholders": {}
+  },
+  "profile": "PROFILE",
+  "@profile": {
+    "description": "Label for the profile tab",
+    "type": "text",
+    "placeholders": {}
+  }
+}

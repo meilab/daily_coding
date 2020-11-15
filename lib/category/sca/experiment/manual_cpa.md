@@ -1,0 +1,308 @@
+CPA 攻击的理论基础请参见视频讲解。
+
+### 抓取 trace
+
+通过软件抓取电压 trace，并存储。将起导入 Python 程序中，存储为 numpy 格式
+
+使用 bokeh 绘图：
+
+```python
+from bokeh.plotting import figure, show
+from bokeh.io import output_notebook
+
+output_notebook()
+p = figure()
+
+xrange = range(len(traces[0]))
+p.line(xrange, traces[2], line_color="red")
+show(p)
+```
+
+获取 trace 的基本信息：
+
+```python
+numtraces = np.shape(trace_array)[0] #total number of traces
+numpoints = np.shape(trace_array)[1] #samples per trace
+```
+
+为了进行分析，我们需要遍历我们想要攻击的密钥中的每个字节，以及每条 trace：
+
+```python
+for bnum in range(0, 16):
+    for tnum in range(0, numtraces):
+        pass
+```
+
+虽然我们没有遍历它们，但请注意每条 trace 都由一堆采样点组成。
+让我们仔细查看 AES 的原理，以便我们可以用一些实际代码替换`pass`。
+
+### 相关性计算
+
+现在我们已经获取了一些目标板的功率 trace，我们可以继续我们的攻击的下一步。回想一下 AES 如何工作，请记住我们正在有效地尝试定位此图底部的位置：
+
+![title](https://wiki.newae.com/images/7/71/Sbox_cpa_detail.png)
+
+我们的目标是确定 S-Box 的输出，其中 S-Box 定义如下：
+
+```python
+sbox = (
+    0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+    0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+    0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+    0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a, 0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+    0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0, 0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+    0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b, 0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+    0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85, 0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+    0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5, 0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+    0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17, 0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+    0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88, 0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+    0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c, 0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+    0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9, 0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+    0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6, 0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+    0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+    0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+    0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16)
+```
+
+因此，我们需要编写一个函数，有两个输入参数，分别是输入文本的一个字节，密钥猜测的一个字节，返回值是 S-Box 的输出：
+
+```python
+def intermediate(pt, keyguess):
+    return sbox[pt ^ keyguess]
+```
+
+最后，我们想要得到 S-Box 输出的汉明重量。我们的假设是系统泄漏了 S-Box 输出的汉明重量。作为一个呆萌的解决方案，我们可以先将每个数字转换为二进制并计算其有多少个 1：
+
+```python
+>>> bin(0x1F)
+'0b11111'
+>>> bin(0x1F).count('1')
+5
+```
+
+这个方法会相当慢。相反，我们使用这个想法制作一个查找表：
+
+```python
+HW = [bin(n).count("1") for n in range(0, 256)]
+```
+
+### 进行计算
+
+我们的目标是计算以下公式：
+$$r_{i,j} = \frac{\sum_{d=1}^{D}[(h_{d,i} - \bar{h_i})(t_{d,j}-\bar{t_j})]}{\sqrt{\sum_{d=1}^D(h_{d,i}-\bar{h_i})^2\sum_{d=1}^D(t_{d,j}-\bar{t_j})^2}}$$
+
+其中：
+
+| **Equation** | **Python Variable** | **Value**                   |
+| ------------ | ------------------- | --------------------------- |
+| d            | tnum                | trace number                |
+| i            | kguess              | subkey guess                |
+| j            | j index trace point | sample point in trace       |
+| h            | hypint              | guess for power consumption |
+| t            | traces              | traces                      |
+
+可以注意到这其中有三个求总和的运算，这些都是针对所有的 trace 进行的求总和。对于目前这个初始实现，我们将明确地计算这些总和而不使用 Numpy，尽管使用 NumPy 来计算大型数组的速度更快。我们将这三个求总和转换为变量，将等式转换为下面格式：
+
+$$r_{i,j}=\frac{sumnum}{\sqrt{snumden1 * sumden2}}$$
+
+其中:
+
+$$sumnum = \sum_{d=1}^{D}[(h_{d,i} - \bar{h_i})(t_{d,j}-\bar{t_j})]$$
+
+$$sumden1 = \sum_{d=1}^D(h_{d,i}-\bar{h_i})^2$$
+
+$$sumden2 = \sum_{d=1}^D(t_{d,j}-\bar{t_j})^2$$
+
+观察上面的公式，我们可以看到我们需要$\bar{h_i}$和$\bar{t_j}$，所以让我们首先编写代码获得这些信息。回看一下 CPA 的教程，我们可以看到$h_{d，i}$只是我们对子密钥（subkey）$i$在 trace $d$的功耗猜测。我们可以使用前面定义的`HW`数组和`intermediate（）`函数轻松实现：
+
+```python
+for bnum in range(0, 16):
+    cpaoutput = [0]*256
+    maxcpa = [0]*256
+    for kguess in range(0, 256):
+        hyp = np.zeros(numtraces)
+        for tnum in range(0, numtraces):
+            hyp[tnum] = HW[intermediate(pt[tnum][bnum], kguess)]
+```
+
+这样我们就可以获取$\bar{h_i}$:
+
+```python
+meanh = np.mean(hyp, dtype=np.float64)
+```
+
+$\bar{t_j}$只是所有 trace 的均值:
+
+```python
+meant = np.mean(traces, axis=0, dtype=np.float64)
+```
+
+接下来，让我们使用$h_{d，i}$和$t_{d，j}$以及我们刚刚计算的值来计算总和：
+
+```python
+#For each trace, do the following
+for tnum in range(numtraces):
+    hdiff = (hyp[tnum] - meanh)
+    tdiff = traces[tnum,:] - meant
+
+    sumnum = sumnum + (hdiff*tdiff)
+    sumden1 = sumden1 + hdiff*hdiff
+    sumden2 = sumden2 + tdiff*tdiff
+```
+
+我们现在可以得到每个子密钥（subkey）猜测的相关性，我们称之为`cpaoutput[]`：
+
+```python
+cpaoutput[kguess] = sumnum / np.sqrt( sumden1 * sumden2 )
+```
+
+到此，我们差不多就完成了！剩下的就是使用该相关性来确定哪个子密钥（subkey）最符合我们的功率 trace。首先，我们只关心相关性（correlation）的绝对值（即存在线性相关），而不关心正负号。此外，虽然这并不影响我们的相关性计算，但请记住，每条 trace 实际上都是由一堆样本点组成的。这意味着我们实际得到的是每个子密钥猜测与每个采样点的相关性。通常在 trace 中只有几个点是相关的，并且它是我们所关注的整个 trace 的最大值，因此我们可以通过以下方式选择每个子密钥的相关性：
+
+```python
+maxcpa[kguess] = max(abs(cpaoutput[kguess]))
+```
+
+Finally, we can find the subkey that best matches our data by finding the one with the biggest correlation:
+最后，通过找到具有最大相关性的一项，我们就可以找到最符合我们数据的子密钥：
+
+```python
+bestguess[bnum] = np.argmax(maxcpa)
+```
+
+### 最终的代码
+
+```python
+import numpy as np
+from tqdm import tqdm
+
+sbox = (
+    0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+    0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+    0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+    0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a, 0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+    0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0, 0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+    0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b, 0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+    0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85, 0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+    0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5, 0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+    0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17, 0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+    0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88, 0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+    0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c, 0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+    0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9, 0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+    0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6, 0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+    0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+    0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+    0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16)
+
+def intermediate(pt, keyguess):
+    return sbox[pt ^ keyguess]
+
+HW = [bin(n).count("1") for n in range(0, 256)]
+
+numtraces = np.shape(trace_array)[0] #total number of traces
+numpoint = np.shape(trace_array)[1] #samples per trace
+
+pt = textin_array
+traces = trace_array
+knownkey = known_keys[0]
+cparefs = [0] * 16
+bestguess = [0]*16
+
+for bnum in tqdm(range(0, 16), desc='Attacking subkeys'):
+    cpaoutput = [0] * 256
+    maxcpa = [0] * 256
+    for kguess in range(0, 256):
+
+        # Initialize arrays &amp; variables to zero
+        sumnum = np.zeros(numpoint)
+        sumden1 = np.zeros(numpoint)
+        sumden2 = np.zeros(numpoint)
+
+        hyp = np.zeros(numtraces)
+        for tnum in range(0, numtraces):
+            hyp[tnum] = HW[intermediate(pt[tnum][bnum], kguess)]
+
+        # Mean of hypothesis
+        meanh = np.mean(hyp, dtype=np.float64)
+
+        # Mean of all points in trace
+        meant = np.mean(traces, axis=0, dtype=np.float64)
+
+        # For each trace, do the following
+        for tnum in range(0, numtraces):
+            hdiff = (hyp[tnum] - meanh)
+            tdiff = traces[tnum, :] - meant
+
+            sumnum = sumnum + (hdiff * tdiff)
+            sumden1 = sumden1 + hdiff * hdiff
+            sumden2 = sumden2 + tdiff * tdiff
+
+        cpaoutput[kguess] = sumnum / np.sqrt(sumden1 * sumden2)
+        maxcpa[kguess] = max(abs(cpaoutput[kguess]))
+
+    bestguess[bnum] = np.argmax(maxcpa)
+    cparefs[bnum] = np.argsort(maxcpa)[::-1]
+
+print("Best Key Guess: ", end="")
+for b in bestguess: print("%02x " % b, end="")
+```
+
+### 验证
+
+由于实验中我们已知密钥（并在 knownkey 中跟踪它），我们可以检查我们的猜测是否正确：
+
+```python
+for b in knownkey: print("%02x "%b, end="")
+print("\n")
+if (knownkey == bestguess).all():
+    print("Guess was right")
+else:
+    print("Guess was wrong")
+```
+
+我们可以通过计算部分猜测熵（PGE）来更好地实现。
+
+部分猜测熵（PGE）是对正确答案进行排名的有用度量。 这要求我们知道操作过程中使用的实际加密密钥，而这点我们已知！
+
+某些攻击在采集期间将使用不同的密钥，这意味着由于没有常量密钥，因此需要所有已知密钥的列表。 在我们的例子中，我们可以访问`knownkey`。
+
+之前，我们只是打印每个子密钥的最大输出，如下所示：
+
+```python
+#Find maximum value of key
+bestguess[bnum] = np.argmax(maxcpa)
+```
+
+现在我们要对 CPA 输出列表进行排序，为了快速，我们将使用 NumPy 中的`argsort()`函数。这将输出一个列表，其中第一个元素是最低值的索引，下一个元素是下一个最高元素的索引，以此类推。因为在我们的输入列表中，`maxcpa`向量的索引对应于密钥猜测，这使得我们知道密钥在哪里。我们反转该排序列表以将第一个元素作为最大 CPA 输出：
+
+```python
+cparefs = np.argsort(maxcpa)[::-1]
+```
+
+最后，部分猜测熵(PGE)只是该数组内已知正确密钥字节的位置。我们可以通过`.index()`函数找到它：
+
+```python
+print cparefs.index(0x2B)
+```
+
+正确的密钥当然应该来自我们的`knownkey`变量，而不是硬编码。 将它们全部整合在一起：
+
+```python
+pge = [0]*16
+for bnum in range(0, 16):
+    #Find maximum value of key
+    #Find PGE
+    pge[bnum] = list(cparefs[bnum]).index(knownkey[bnum])
+
+print("PGE: ", end="")
+for i in pge:
+    print(i, end="")
+print("")
+```
+
+### 改进点
+
+相关性函数在所有 trace 都会运行一遍。理想情况下，我们希望将其作为“在线”计算; 也就是说，我们可以添加一个 trace，观察其输出，添加另一个 trace，观察其输出，一直持续下去。当我们需要生成部分猜测熵（PGE）与跟踪数量的关系时，这是非常帮的方式，否则我们需要进行多次运行循环！
+
+我们可以使用其他形式的相关方程，它明确地存储变量的总和。这更容易执行在线计算，因为添加新跟踪时更新这些总和很简单。 这个等式的形式如下：
+
+$$r_{i,j} = \frac{D\sum_{d=1}^{D}h_{d,i}t_{d,j}-\sum_{d=1}^{D}h_{d,i}\sum_{d=1}^{D}t_{d,j}}{\sqrt{((\sum_{d=1}^Dh_{d,i})^2-D\sum_{d=1}^Dh_{d,i}^2)-((\sum_{d=1}^Dt_{d,j})^2-D\sum_{d=1}^Dh_{d,j}^2)}}$$

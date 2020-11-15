@@ -1,0 +1,28 @@
+{
+  "@@locale":"zh_CN",
+  "@@last_modified": "2019-07-26T05:40:50.486654",
+  "title": "编程日课",
+  "@title": {
+    "description": "Title for the Xld application",
+    "type": "text",
+    "placeholders": {}
+  },
+  "about": "关于",
+  "@about": {
+    "description": "Label for the About tab",
+    "type": "text",
+    "placeholders": {}
+  },
+  "settings": "设置",
+  "@settings": {
+    "description": "Label for the Settings tab",
+    "type": "text",
+    "placeholders": {}
+  },
+  "profile": "履历",
+  "@profile": {
+    "description": "Label for the profile tab",
+    "type": "text",
+    "placeholders": {}
+  }
+}
