@@ -26,7 +26,7 @@ class FeedMainPage extends StatelessWidget {
         ),
         body: Consumer<FeedListViewModel>(
           builder:
-              (BuildContext context, FeedListViewModel value, Widget child) {
+              (BuildContext context, FeedListViewModel value, Widget? child) {
             var feedList = value.feedList;
             return feedList.length == 0
                 ? Center(child: CircularProgressIndicator())
@@ -152,7 +152,7 @@ class FeedMainPage extends StatelessWidget {
 }
 
 class FeedListViewModel with ChangeNotifier {
-  List<EntryDetail> feedList = List();
+  List<EntryDetail> feedList = [];
   int pageIndex = 0;
 
   void getJuejinFeedList(String tagId) async {

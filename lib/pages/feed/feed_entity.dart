@@ -1,27 +1,21 @@
 import 'dart:convert' show json;
 
 T asT<T>(dynamic value) {
-  if (value is T) {
-    return value;
-  }
-
-  return null;
+  return value;
 }
 
 class FeedEntity {
   FeedEntity({
-    this.s,
-    this.m,
-    this.d,
+    required this.s,
+    required this.m,
+    required this.d,
   });
 
-  factory FeedEntity.fromJson(Map<String, dynamic> jsonRes) => jsonRes == null
-      ? null
-      : FeedEntity(
-          s: asT<int>(jsonRes['s']),
-          m: asT<String>(jsonRes['m']),
-          d: D.fromJson(asT<Map<String, dynamic>>(jsonRes['d'])),
-        );
+  factory FeedEntity.fromJson(Map<String, dynamic> jsonRes) => FeedEntity(
+        s: asT<int>(jsonRes['s']),
+        m: asT<String>(jsonRes['m']),
+        d: D.fromJson(asT<Map<String, dynamic>>(jsonRes['d'])),
+      );
 
   int s;
   String m;
@@ -41,16 +35,13 @@ class FeedEntity {
 
 class D {
   D({
-    this.total,
-    this.entrylist,
+    required this.total,
+    required this.entrylist,
   });
 
   factory D.fromJson(Map<String, dynamic> jsonRes) {
-    if (jsonRes == null) {
-      return null;
-    }
-
-    final List<EntryDetail> entrylist = jsonRes['entrylist'] is List ? <EntryDetail>[] : null;
+    final List<EntryDetail> entrylist =
+        jsonRes['entrylist'] is List ? <EntryDetail>[] : null;
     if (entrylist != null) {
       for (final dynamic item in jsonRes['entrylist']) {
         if (item != null) {
@@ -80,47 +71,43 @@ class D {
 
 class EntryDetail {
   EntryDetail({
-    this.collectionCount,
-    this.userRankIndex,
-    this.buildTime,
-    this.commentsCount,
-    this.gfw,
-    this.objectId,
-    this.checkStatus,
-    this.isEvent,
-    this.entryView,
-    this.subscribersCount,
-    this.ngxCachedTime,
-    this.verifyStatus,
-    this.tags,
-    this.updatedAt,
-    this.rankIndex,
-    this.hot,
-    this.autoPass,
-    this.originalUrl,
-    this.verifyCreatedAt,
-    this.createdAt,
-    this.user,
-    this.author,
-    this.screenshot,
-    this.original,
-    this.hotIndex,
-    this.content,
-    this.title,
-    this.lastCommentTime,
-    this.type,
-    this.english,
-    this.category,
-    this.viewsCount,
-    this.summaryInfo,
-    this.isCollected,
+    required this.collectionCount,
+    required this.userRankIndex,
+    required this.buildTime,
+    required this.commentsCount,
+    required this.gfw,
+    required this.objectId,
+    required this.checkStatus,
+    required this.isEvent,
+    required this.entryView,
+    required this.subscribersCount,
+    required this.ngxCachedTime,
+    required this.verifyStatus,
+    required this.tags,
+    required this.updatedAt,
+    required this.rankIndex,
+    required this.hot,
+    required this.autoPass,
+    required this.originalUrl,
+    required this.verifyCreatedAt,
+    required this.createdAt,
+    required this.user,
+    required this.author,
+    required this.screenshot,
+    required this.original,
+    required this.hotIndex,
+    required this.content,
+    required this.title,
+    required this.lastCommentTime,
+    required this.type,
+    required this.english,
+    required this.category,
+    required this.viewsCount,
+    required this.summaryInfo,
+    required this.isCollected,
   });
 
   factory EntryDetail.fromJson(Map<String, dynamic> jsonRes) {
-    if (jsonRes == null) {
-      return null;
-    }
-
     final List<Tags> tags = jsonRes['tags'] is List ? <Tags>[] : null;
     if (tags != null) {
       for (final dynamic item in jsonRes['tags']) {
@@ -160,7 +147,8 @@ class EntryDetail {
       lastCommentTime: asT<String>(jsonRes['lastCommentTime']),
       type: asT<String>(jsonRes['type']),
       english: asT<bool>(jsonRes['english']),
-      category: Category.fromJson(asT<Map<String, dynamic>>(jsonRes['category'])),
+      category:
+          Category.fromJson(asT<Map<String, dynamic>>(jsonRes['category'])),
       viewsCount: asT<int>(jsonRes['viewsCount']),
       summaryInfo: asT<String>(jsonRes['summaryInfo']),
       isCollected: asT<bool>(jsonRes['isCollected']),
@@ -247,20 +235,18 @@ class EntryDetail {
 
 class Tags {
   Tags({
-    this.ngxCachedTime,
-    this.ngxCached,
-    this.title,
-    this.id,
+    required this.ngxCachedTime,
+    required this.ngxCached,
+    required this.title,
+    required this.id,
   });
 
-  factory Tags.fromJson(Map<String, dynamic> jsonRes) => jsonRes == null
-      ? null
-      : Tags(
-          ngxCachedTime: asT<int>(jsonRes['ngxCachedTime']),
-          ngxCached: asT<bool>(jsonRes['ngxCached']),
-          title: asT<String>(jsonRes['title']),
-          id: asT<String>(jsonRes['id']),
-        );
+  factory Tags.fromJson(Map<String, dynamic> jsonRes) => Tags(
+        ngxCachedTime: asT<int>(jsonRes['ngxCachedTime']),
+        ngxCached: asT<bool>(jsonRes['ngxCached']),
+        title: asT<String>(jsonRes['title']),
+        id: asT<String>(jsonRes['id']),
+      );
 
   int ngxCachedTime;
   bool ngxCached;
@@ -282,52 +268,50 @@ class Tags {
 
 class User {
   User({
-    this.community,
-    this.collectedEntriesCount,
-    this.company,
-    this.followersCount,
-    this.followeesCount,
-    this.role,
-    this.postedPostsCount,
-    this.level,
-    this.isAuthor,
-    this.postedEntriesCount,
-    this.totalCommentsCount,
-    this.ngxCachedTime,
-    this.ngxCached,
-    this.viewedEntriesCount,
-    this.jobTitle,
-    this.subscribedTagsCount,
-    this.totalCollectionsCount,
-    this.username,
-    this.avatarLarge,
-    this.objectId,
+    required this.community,
+    required this.collectedEntriesCount,
+    required this.company,
+    required this.followersCount,
+    required this.followeesCount,
+    required this.role,
+    required this.postedPostsCount,
+    required this.level,
+    required this.isAuthor,
+    required this.postedEntriesCount,
+    required this.totalCommentsCount,
+    required this.ngxCachedTime,
+    required this.ngxCached,
+    required this.viewedEntriesCount,
+    required this.jobTitle,
+    required this.subscribedTagsCount,
+    required this.totalCollectionsCount,
+    required this.username,
+    required this.avatarLarge,
+    required this.objectId,
   });
 
-  factory User.fromJson(Map<String, dynamic> jsonRes) => jsonRes == null
-      ? null
-      : User(
-          community: asT<Object>(jsonRes['community']),
-          collectedEntriesCount: asT<int>(jsonRes['collectedEntriesCount']),
-          company: asT<String>(jsonRes['company']),
-          followersCount: asT<int>(jsonRes['followersCount']),
-          followeesCount: asT<int>(jsonRes['followeesCount']),
-          role: asT<String>(jsonRes['role']),
-          postedPostsCount: asT<int>(jsonRes['postedPostsCount']),
-          level: asT<int>(jsonRes['level']),
-          isAuthor: asT<bool>(jsonRes['isAuthor']),
-          postedEntriesCount: asT<int>(jsonRes['postedEntriesCount']),
-          totalCommentsCount: asT<int>(jsonRes['totalCommentsCount']),
-          ngxCachedTime: asT<int>(jsonRes['ngxCachedTime']),
-          ngxCached: asT<bool>(jsonRes['ngxCached']),
-          viewedEntriesCount: asT<int>(jsonRes['viewedEntriesCount']),
-          jobTitle: asT<String>(jsonRes['jobTitle']),
-          subscribedTagsCount: asT<int>(jsonRes['subscribedTagsCount']),
-          totalCollectionsCount: asT<int>(jsonRes['totalCollectionsCount']),
-          username: asT<String>(jsonRes['username']),
-          avatarLarge: asT<String>(jsonRes['avatarLarge']),
-          objectId: asT<String>(jsonRes['objectId']),
-        );
+  factory User.fromJson(Map<String, dynamic> jsonRes) => User(
+        community: asT<Object>(jsonRes['community']),
+        collectedEntriesCount: asT<int>(jsonRes['collectedEntriesCount']),
+        company: asT<String>(jsonRes['company']),
+        followersCount: asT<int>(jsonRes['followersCount']),
+        followeesCount: asT<int>(jsonRes['followeesCount']),
+        role: asT<String>(jsonRes['role']),
+        postedPostsCount: asT<int>(jsonRes['postedPostsCount']),
+        level: asT<int>(jsonRes['level']),
+        isAuthor: asT<bool>(jsonRes['isAuthor']),
+        postedEntriesCount: asT<int>(jsonRes['postedEntriesCount']),
+        totalCommentsCount: asT<int>(jsonRes['totalCommentsCount']),
+        ngxCachedTime: asT<int>(jsonRes['ngxCachedTime']),
+        ngxCached: asT<bool>(jsonRes['ngxCached']),
+        viewedEntriesCount: asT<int>(jsonRes['viewedEntriesCount']),
+        jobTitle: asT<String>(jsonRes['jobTitle']),
+        subscribedTagsCount: asT<int>(jsonRes['subscribedTagsCount']),
+        totalCollectionsCount: asT<int>(jsonRes['totalCollectionsCount']),
+        username: asT<String>(jsonRes['username']),
+        avatarLarge: asT<String>(jsonRes['avatarLarge']),
+        objectId: asT<String>(jsonRes['objectId']),
+      );
 
   Object community;
   int collectedEntriesCount;
@@ -381,22 +365,20 @@ class User {
 
 class Category {
   Category({
-    this.ngxCached,
-    this.title,
-    this.id,
-    this.name,
-    this.ngxCachedTime,
+    required this.ngxCached,
+    required this.title,
+    required this.id,
+    required this.name,
+    required this.ngxCachedTime,
   });
 
-  factory Category.fromJson(Map<String, dynamic> jsonRes) => jsonRes == null
-      ? null
-      : Category(
-          ngxCached: asT<bool>(jsonRes['ngxCached']),
-          title: asT<String>(jsonRes['title']),
-          id: asT<String>(jsonRes['id']),
-          name: asT<String>(jsonRes['name']),
-          ngxCachedTime: asT<int>(jsonRes['ngxCachedTime']),
-        );
+  factory Category.fromJson(Map<String, dynamic> jsonRes) => Category(
+        ngxCached: asT<bool>(jsonRes['ngxCached']),
+        title: asT<String>(jsonRes['title']),
+        id: asT<String>(jsonRes['id']),
+        name: asT<String>(jsonRes['name']),
+        ngxCachedTime: asT<int>(jsonRes['ngxCachedTime']),
+      );
 
   bool ngxCached;
   String title;

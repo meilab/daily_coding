@@ -2,8 +2,8 @@ import 'package:fluro/fluro.dart';
 import '../routers/router_handler.dart';
 
 class RouterManager {
-  static Router router;
-  static void configureRoutes(Router router) {
+  static late FluroRouter router;
+  static void configureRoutes(FluroRouter router) {
     router.define("/home", handler: homeHandler);
     router.define("/dailyCodingContainer",
         handler: dailyCodingContainerHandler);
@@ -26,7 +26,7 @@ class RouterManager {
   }
 
   static init() {
-    router = Router();
+    router = FluroRouter();
     configureRoutes(router);
   }
 }

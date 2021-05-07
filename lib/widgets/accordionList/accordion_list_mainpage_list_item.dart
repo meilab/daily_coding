@@ -8,10 +8,10 @@ import 'package:provider/provider.dart';
 class AccordionListMainPageListItem extends StatefulWidget {
   final CardItem cardItem;
   final AnimationController animationController;
-  final Animation<dynamic> animation;
+  final Animation<double> animation;
 
   AccordionListMainPageListItem(this.cardItem,
-      {Key key, this.animationController, this.animation})
+      {Key? key, required this.animationController, required this.animation})
       : super(key: key);
 
   @override
@@ -22,7 +22,7 @@ class AccordionListMainPageListItem extends StatefulWidget {
 class _AccordionListMainPageListItemState
     extends State<AccordionListMainPageListItem>
     with SingleTickerProviderStateMixin {
-  AnimationController controller;
+  late AnimationController controller;
 
   @override
   void initState() {
@@ -42,11 +42,11 @@ class _AccordionListMainPageListItemState
   Widget build(BuildContext context) {
     final ContentNotifier contentNotifier =
         Provider.of<ContentNotifier>(context);
-    final cardList = contentNotifier.getCardList() ?? [];
+    final cardList = contentNotifier.getCardList();
 
     return AnimatedBuilder(
         animation: widget.animationController,
-        builder: (BuildContext context, Widget child) {
+        builder: (BuildContext context, Widget? child) {
           return FadeTransition(
               opacity: widget.animation,
               child: Transform(

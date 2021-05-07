@@ -80,7 +80,7 @@ flutter:
 
     - lib/category/sca/theory/
     - lib/category/sca/firmware/
-    - lib/category/sca/ml/
+    # - lib/category/sca/ml/
     - lib/category/sca/experiment/
 
   fonts:

@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 class AnimatedListMainPageListItem extends StatelessWidget {
   final CardItem cardItem;
   final AnimationController animationController;
-  final Animation<dynamic> animation;
+  final Animation<double> animation;
 
   AnimatedListMainPageListItem(this.cardItem,
-      {Key key, this.animationController, this.animation})
+      {Key? key, required this.animationController, required this.animation})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
         animation: animationController,
-        builder: (BuildContext context, Widget child) {
+        builder: (BuildContext context, Widget? child) {
           return FadeTransition(
             opacity: animation,
             child: Transform(
@@ -43,7 +43,7 @@ class AnimatedListMainPageListItem extends StatelessWidget {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 8),
                                   child: Text(
-                                    cardItem?.subtitle ?? "",
+                                    cardItem.subtitle,
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Color.fromARGB(255, 100, 100, 135),

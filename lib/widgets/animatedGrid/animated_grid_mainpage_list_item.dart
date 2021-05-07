@@ -8,10 +8,10 @@ import 'package:provider/provider.dart';
 class AnimatedGridMainPageListItem extends StatefulWidget {
   final CardItem cardItem;
   final AnimationController animationController;
-  final Animation<dynamic> animation;
+  final Animation<double> animation;
 
   AnimatedGridMainPageListItem(this.cardItem,
-      {Key key, this.animationController, this.animation})
+      {Key? key, required this.animationController, required this.animation})
       : super(key: key);
 
   @override
@@ -22,7 +22,7 @@ class AnimatedGridMainPageListItem extends StatefulWidget {
 class _AnimatedGridMainPageListItemState
     extends State<AnimatedGridMainPageListItem>
     with SingleTickerProviderStateMixin {
-  AnimationController controller;
+  late AnimationController controller;
 
   @override
   void initState() {
@@ -42,10 +42,10 @@ class _AnimatedGridMainPageListItemState
   Widget build(BuildContext context) {
     final ContentNotifier contentNotifier =
         Provider.of<ContentNotifier>(context);
-    final cardList = contentNotifier.getCardList() ?? [];
+    final cardList = contentNotifier.getCardList();
     return AnimatedBuilder(
         animation: widget.animationController,
-        builder: (BuildContext context, Widget child) {
+        builder: (BuildContext context, Widget? child) {
           return FadeTransition(
               opacity: widget.animation,
               child: Transform(

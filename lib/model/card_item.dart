@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class CardItem {
   const CardItem({
-    this.title,
-    this.subtitle,
-    this.icon,
-    this.imgUrl,
-    this.onTap,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.imgUrl,
+    required this.onTap,
   });
 
   final String title;

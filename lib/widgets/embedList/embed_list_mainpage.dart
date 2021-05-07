@@ -15,7 +15,7 @@ class EmbedListMainPage extends StatefulWidget {
 
 class _EmbedListMainPageState extends State<EmbedListMainPage>
     with TickerProviderStateMixin {
-  AnimationController animationController;
+  late AnimationController animationController;
 
   initState() {
     super.initState();

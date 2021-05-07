@@ -15,30 +15,28 @@ class Network {
   }
 
   static init() {
-    dio.interceptors
-        .add(InterceptorsWrapper(onRequest: (RequestOptions options) {
+    dio.interceptors.add(InterceptorsWrapper(
+        onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
       options.connectTimeout = 15000;
 
       _logger.info("请求URL:${options.path}");
-      _logger.info("请求头:" + options?.headers.toString());
-      _logger.info("请求contentType:" + options?.contentType.toString());
+      _logger.info("请求头:" + options.headers.toString());
+      _logger.info("请求contentType:" + options.contentType.toString());
       // if (options?.data != null) {
       //   print("请求参数:" + options?.data);
       // }
 
-      return options;
-    }, onResponse: (Response response) {
-      if (response != null) {
-        _logger.info("返回参数:" + response.toString());
-      }
+      return handler.next(options);
+    }, onResponse: (Response response, ResponseInterceptorHandler handler) {
+      _logger.info("返回参数:" + response.toString());
 
-      return response;
-    }, onError: (DioError err) {
+      return handler.next(response);
+    }, onError: (DioError err, ErrorInterceptorHandler handler) {
       _logger.warning("请求异常:" + err.toString());
       // print("请求异常信息: " + err?.response.toString() ?? "");
       String msg;
-      if (err.type == DioErrorType.CONNECT_TIMEOUT ||
-          err.type == DioErrorType.RECEIVE_TIMEOUT) {
+      if (err.type == DioErrorType.connectTimeout ||
+          err.type == DioErrorType.receiveTimeout) {
         msg = "请求超时";
         _logger.warning(msg);
         if (isMobile) {
@@ -48,7 +46,7 @@ class Network {
 
       // return dio.resolve({"errorCode": 500, 'msg': "请求异常", 'data': null});
 
-      return err;
+      return handler.next(err);
     }));
     // dio.interceptors.add(CookieManager(CookieJar()));
   }

@@ -24,7 +24,7 @@ class SettingsPage extends StatelessWidget {
               builder: (BuildContext context) {
                 return BottomSelector(
                     options: MyLocalizationsDelegate.supportedLocales(),
-                    title: MyLocalizations.of(context).changeLocale(),
+                    title: MyLocalizations.of(context)!.changeLocale(),
                     optionTitle: renderLocaleOptionTitle,
                     curState: settingsNotifier.getCurrentLocale(),
                     onSelected: (Locale locale) {
@@ -33,7 +33,7 @@ class SettingsPage extends StatelessWidget {
               });
         },
         leading: Icon(Icons.language),
-        title: Text(MyLocalizations.of(context).changeLocale()),
+        title: Text(MyLocalizations.of(context)!.changeLocale()),
         subtitle: Text(settingsNotifier.getCurrentLocale()?.languageCode ?? ""),
       ),
     ];
@@ -50,7 +50,7 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(MyLocalizations.of(context).settings())),
+        appBar: AppBar(title: Text(MyLocalizations.of(context)!.settings())),
         body: buildSettingsPane(context));
   }
 }

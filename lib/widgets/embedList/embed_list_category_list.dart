@@ -15,7 +15,7 @@ class EmbedListCategoryList extends StatefulWidget {
 
 class _EmbedListCategoryListState extends State<EmbedListCategoryList>
     with TickerProviderStateMixin {
-  AnimationController animationController;
+  late AnimationController animationController;
 
   initState() {
     super.initState();

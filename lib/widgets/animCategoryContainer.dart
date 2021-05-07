@@ -12,10 +12,10 @@ class AnimCategoryContainer extends StatefulWidget {
 
 class _AnimCategoryContainerState extends State<AnimCategoryContainer>
     with SingleTickerProviderStateMixin {
-  bool isExpanded;
-  AnimationController controller;
-  Animation<EdgeInsetsGeometry> marginAnim;
-  Animation<BorderRadius> radiusAnim;
+  late bool isExpanded;
+  late AnimationController controller;
+  late Animation<EdgeInsetsGeometry> marginAnim;
+  late Animation<BorderRadius> radiusAnim;
 
   @override
   void initState() {
@@ -59,7 +59,7 @@ class _AnimCategoryContainerState extends State<AnimCategoryContainer>
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: () {
-                widget.categoryBean.onTap();
+                widget.categoryBean.onTap?.call();
                 onTap();
               },
               child: Column(

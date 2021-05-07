@@ -19,8 +19,8 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
-  AnimationController _animationController;
-  SplashAnimManager _splashAnimManager;
+  late AnimationController _animationController;
+  late SplashAnimManager _splashAnimManager;
 
   @override
   void initState() {
@@ -55,7 +55,7 @@ class _SplashPageState extends State<SplashPage>
     });
     articleList.addAll(buildDailyCodingCategoryList(context));
     articleList.addAll(buildTwolangCategoryList(context));
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
       Provider.of<CollectNotifier>(context, listen: false)
           .setArticles(articleList);
     });
@@ -88,7 +88,7 @@ class _SplashPageState extends State<SplashPage>
               return Positioned(
                 right: _splashAnimManager.animLeft.value,
                 child: Text(
-                  MyLocalizations.of(context).daily(),
+                  MyLocalizations.of(context)!.daily(),
                   style: TextStyle(
                     fontSize: 60,
                     color: Colors.white,
@@ -112,7 +112,7 @@ class _SplashPageState extends State<SplashPage>
                     color: Color.fromARGB(255, 253, 152, 39),
                   ),
                   child: Text(
-                    MyLocalizations.of(context).coding(),
+                    MyLocalizations.of(context)!.coding(),
                     style: TextStyle(
                       fontSize: 60,
                       fontWeight: FontWeight.w600,

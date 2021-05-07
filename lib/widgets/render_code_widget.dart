@@ -21,8 +21,7 @@ class _RenderCodeWidgetState extends State<RenderCodeWidget> {
     final ContentNotifier contentNotifier =
         Provider.of<ContentNotifier>(context);
 
-    String _markdownCodeString =
-        contentNotifier.getMarkdownCodeString() ?? 'Example code not found';
+    String _markdownCodeString = contentNotifier.getMarkdownCodeString();
 
     Widget mdCode;
 
@@ -39,27 +38,27 @@ class _RenderCodeWidgetState extends State<RenderCodeWidget> {
         ),
       );
     } catch (err) {
-      mdCode = Text(_markdownCodeString ??= '');
+      mdCode = Text(_markdownCodeString);
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text(MyLocalizations.of(context).demoCode()),
+        title: Text(MyLocalizations.of(context)!.demoCode()),
         actions: [
           IconButton(
               icon: Icon(Icons.copy),
-              tooltip: MyLocalizations.of(context).click2Copy(),
+              tooltip: MyLocalizations.of(context)!.click2Copy(),
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: _markdownCodeString));
                 if (isMobile) {
                   Fluttertoast.showToast(
-                      msg: MyLocalizations.of(context).copyFinished(),
+                      msg: MyLocalizations.of(context)!.copyFinished(),
                       fontSize: 64,
                       gravity: ToastGravity.CENTER);
                 }
               }),
         ],
       ),
-      body: _markdownCodeString == null
+      body: _markdownCodeString == 'Example code not found'
           ? Center(
               child: Text('Not found'),
             )

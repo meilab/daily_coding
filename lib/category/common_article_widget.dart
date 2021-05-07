@@ -39,7 +39,7 @@ class CommonArticleWidget extends StatelessWidget {
           IconButton(
             icon: Icon(collected ? Icons.star : Icons.star_border),
             color: Colors.black54,
-            tooltip: MyLocalizations.of(context).collect(),
+            tooltip: MyLocalizations.of(context)!.collect(),
             onPressed: () {
               localStorageManager.putStringList('collects', collects);
             },
@@ -65,9 +65,9 @@ class CommonArticleWidget extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 24.0),
                     child: Text(
-                        MyLocalizations.of(context).dailyCodingPromotion(),
+                        MyLocalizations.of(context)!.dailyCodingPromotion(),
                         style: theme.textTheme.headline5
-                            .copyWith(color: theme.primaryColor)),
+                            ?.copyWith(color: theme.primaryColor)),
                   ),
                   SizedBox(height: MyMetrics.baseMargin),
                   Image.asset(

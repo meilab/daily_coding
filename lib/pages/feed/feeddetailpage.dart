@@ -9,14 +9,14 @@ import 'package:webview_flutter/webview_flutter.dart';
 class FeedDetailPage extends StatefulWidget {
   final EntryDetail article;
 
-  const FeedDetailPage({Key key, this.article}) : super(key: key);
+  const FeedDetailPage({Key? key, required this.article}) : super(key: key);
 
   @override
   _FeedDetailPageState createState() => _FeedDetailPageState();
 }
 
 class _FeedDetailPageState extends State<FeedDetailPage> {
-  WebViewController _webViewController;
+  late WebViewController _webViewController;
   Completer<bool> _finishedCompleter = Completer();
 
   ValueNotifier canGoBack = ValueNotifier(false);
@@ -31,7 +31,7 @@ class _FeedDetailPageState extends State<FeedDetailPage> {
             FutureBuilder<bool>(
               future: _finishedCompleter.future,
               initialData: false,
-              builder: (context, snapshot) => snapshot.data
+              builder: (context, snapshot) => (snapshot.data != null)
                   ? SizedBox.shrink()
                   : Container(
                       width: 20,
@@ -43,7 +43,7 @@ class _FeedDetailPageState extends State<FeedDetailPage> {
                     ),
             ),
             SizedBox(width: 16),
-            Expanded(child: Text(MyLocalizations.of(context).detail())),
+            Expanded(child: Text(MyLocalizations.of(context)!.detail())),
           ],
         ),
         centerTitle: true,
@@ -82,25 +82,27 @@ class _FeedDetailPageState extends State<FeedDetailPage> {
           children: <Widget>[
             ValueListenableBuilder(
               valueListenable: canGoBack,
-              builder: (context, value, child) => IconButton(
-                  icon: Icon(Icons.arrow_back_ios),
-                  onPressed: !value
-                      ? null
-                      : () {
-                          _webViewController.goBack();
-                          refreshNavigator();
-                        }),
+              builder: (BuildContext context, dynamic value, Widget? child) =>
+                  IconButton(
+                      icon: Icon(Icons.arrow_back_ios),
+                      onPressed: !value
+                          ? null
+                          : () {
+                              _webViewController.goBack();
+                              refreshNavigator();
+                            }),
             ),
             ValueListenableBuilder(
               valueListenable: canGoForward,
-              builder: (context, value, child) => IconButton(
-                  icon: Icon(Icons.arrow_forward_ios),
-                  onPressed: !value
-                      ? null
-                      : () {
-                          _webViewController.goForward();
-                          refreshNavigator();
-                        }),
+              builder: (BuildContext context, dynamic value, Widget? child) =>
+                  IconButton(
+                      icon: Icon(Icons.arrow_forward_ios),
+                      onPressed: !value
+                          ? null
+                          : () {
+                              _webViewController.goForward();
+                              refreshNavigator();
+                            }),
             ),
             IconButton(
               icon: const Icon(Icons.autorenew),

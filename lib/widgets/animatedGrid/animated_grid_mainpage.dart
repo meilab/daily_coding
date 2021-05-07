@@ -16,7 +16,7 @@ class AnimatedGridMainPage extends StatefulWidget {
 
 class _AnimatedGridMainPageState extends State<AnimatedGridMainPage>
     with TickerProviderStateMixin {
-  AnimationController animationController;
+  late AnimationController animationController;
 
   initState() {
     super.initState();

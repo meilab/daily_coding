@@ -18,14 +18,14 @@ class MyLocalizations {
 
   static Future<MyLocalizations> load(Locale locale) {
     final String name =
-        locale.countryCode.isEmpty ? locale.languageCode : locale.toString();
+        locale.countryCode!.isEmpty ? locale.languageCode : locale.toString();
     final String localeName = Intl.canonicalizedLocale(name);
     return initializeMessages(localeName).then((Object _) {
       return new MyLocalizations(locale);
     });
   }
 
-  static MyLocalizations of(BuildContext context) {
+  static MyLocalizations? of(BuildContext context) {
     return Localizations.of<MyLocalizations>(context, MyLocalizations);
   }
 

@@ -7,7 +7,7 @@ import 'dart:math';
 
 class SearchNotifier extends ChangeNotifier {
   HashMap<String, ArticleItem> _searchMap = HashMap<String, ArticleItem>();
-  TextEditingController _searchController;
+  late TextEditingController _searchController;
 
   HashMap<String, ArticleItem> getSearchMap() => _searchMap;
   TextEditingController get searchController => _searchController;
@@ -17,10 +17,10 @@ class SearchNotifier extends ChangeNotifier {
     // notifyListeners();
   }
 
-  TreeNode _dictionaryTree, _copy;
-  List<String> _dictionaryList;
-  List<String> _prefixSearchResult;
-  List<String> _similaritySearchResult;
+  TreeNode? _dictionaryTree, _copy;
+  List<String> _dictionaryList = [];
+  List<String> _prefixSearchResult = [];
+  List<String> _similaritySearchResult = [];
 
   ///TODO: 用这个方法搜索字典，在search_strategy里可以自定义搜索策略
 
@@ -30,8 +30,8 @@ class SearchNotifier extends ChangeNotifier {
 
   ///从字典中搜索和input相似的单词，编辑距离小等于distance
   List<String> searchSimilarWords(String inputWord, int distance) {
-    _similaritySearchResult = List();
-    if (inputWord == null || inputWord == '') {
+    _similaritySearchResult = [];
+    if (inputWord == '') {
       _similaritySearchResult.clear();
       _similaritySearchResult.addAll(_dictionaryList);
       return _similaritySearchResult;
@@ -49,11 +49,11 @@ class SearchNotifier extends ChangeNotifier {
   }
 
   bool _matchSimilarWords(String word1, String word2, int distance) {
-    List<List<int>> dp = List();
+    List<List<int>> dp = [];
     int len1 = word1.length;
     int len2 = word2.length;
     for (int i = 0; i < len1; i++) {
-      dp.add(List(len2));
+      dp.add(List.filled(len2, 0));
     }
     dp[0][0] = word1[0].toLowerCase() == word2[0].toLowerCase() ? 0 : 1;
 
@@ -84,43 +84,48 @@ class SearchNotifier extends ChangeNotifier {
   ///通过前缀在字典树中查找所有单词
   List<String> searchWordsInTrie(String prefix) {
     if (_dictionaryTree == null) {
-      return List<String>();
+      return [];
     }
-    if (prefix == null || prefix == '') {
+    if (prefix == '') {
       return _dictionaryList;
     }
     _copy = _dictionaryTree;
-    _prefixSearchResult = List();
+    _prefixSearchResult = [];
     String matchedPrefix = '';
     for (int i = 0; i < prefix.length; i++) {
       if (!_matchLetter(prefix[i])) {
-        return List<String>();
+        return [];
       } else {
-        matchedPrefix = matchedPrefix + _copy.val;
+        matchedPrefix = matchedPrefix + (_copy?.val ?? '');
       }
     }
-    _searchAllWords(_copy);
+    if (_copy != null) {
+      _searchAllWords(_copy!);
+    }
     return _prefixSearchResult;
   }
 
   ///从字典单词的任意位置开始匹配前缀
-  List<TreeNode> matchedList;
+  List<TreeNode> matchedList = [];
 
   Set<String> enhancedTriesSearch(String prefix) {
     if (_dictionaryTree == null) {
       return Set<String>();
     }
-    if (prefix == null || prefix == '') {
+    if (prefix == '') {
       return Set.from(_dictionaryList);
     }
     _copy = _dictionaryTree;
 
-    matchedList = List();
+    matchedList = [];
     Queue<TreeNode> queue = Queue(); //广度优先搜索队列
-    queue.add(_copy);
+
+    if (_copy != null) {
+      queue.add(_copy!);
+    }
     _matchFirstLetter(queue, prefix);
 
-    _prefixSearchResult = List();
+    _prefixSearchResult = [];
     for (TreeNode node in matchedList) {
       _searchAllWords(node);
     }
@@ -171,7 +176,7 @@ class SearchNotifier extends ChangeNotifier {
   }
 
   bool _matchLetter(String letter) {
-    for (TreeNode child in _copy.children) {
+    for (TreeNode child in _copy?.children ?? []) {
       if (letter.toLowerCase() == child.val.toLowerCase()) {
         _copy = child;
         return true;
@@ -210,7 +215,7 @@ class SearchNotifier extends ChangeNotifier {
   }
 
   List<int> getNextArray(String t) {
-    List<int> next = List(t.length);
+    List<int> next = List.filled(t.length, 0);
     next[0] = -1;
     next[1] = 0;
     int k;
@@ -239,9 +244,6 @@ class SearchNotifier extends ChangeNotifier {
 
   ///添加单个的单词
   addWord(String word) {
-    if (_dictionaryList == null) {
-      _dictionaryList = List<String>();
-    }
     _dictionaryList.add(word);
 
     if (_dictionaryTree == null) {
@@ -256,7 +258,7 @@ class SearchNotifier extends ChangeNotifier {
   ///把单词添加到字典树
   _addWordInTrie(String c, String intactWord, bool endFlag) {
     bool containFlag = false;
-    for (TreeNode child in _copy.children) {
+    for (TreeNode child in _copy?.children ?? []) {
       if (child.val.toLowerCase() == c.toLowerCase()) {
         containFlag = true;
         _copy = child;
@@ -265,35 +267,35 @@ class SearchNotifier extends ChangeNotifier {
     }
     if (!containFlag) {
       TreeNode childNode = TreeNode(c);
-      _copy.children.add(childNode);
+      _copy?.children.add(childNode);
       _copy = childNode;
     }
 
-    _copy.intactWord.add(intactWord);
-    if (_copy.endFlag == null || !_copy.endFlag) {
-      _copy.endFlag = endFlag;
+    _copy?.intactWord.add(intactWord);
+    if (_copy?.endFlag == null || !(_copy?.endFlag ?? false)) {
+      _copy?.endFlag = endFlag;
     }
   }
 
   ///清空整个字典
   void clearDictionary() {
-    _dictionaryList = null;
+    _dictionaryList = [];
     _dictionaryTree = null;
     _copy = null;
-    _prefixSearchResult = null;
+    _prefixSearchResult = [];
   }
 
   ///清除查找结果
   void clearSearchResult() {
-    _prefixSearchResult = null;
-    _similaritySearchResult = null;
+    _prefixSearchResult = [];
+    _similaritySearchResult = [];
   }
 
   // Strategy
 
   Set<String> defaultSearchStrategy(List<String> words) {
     Set<String> result = Set();
-    if (words == null || words.length == 0) {
+    if (words.length == 0) {
       result.addAll(getDictionary());
       return result;
     }
@@ -315,7 +317,7 @@ class SearchNotifier extends ChangeNotifier {
   Set<String> multiPositionSearchStrategy(List<String> words) {
     Set<String> result = Set();
     for (String word in words) {
-      if (result.length == 0 || word != null && word.length > 0) {
+      if (result.length == 0 || word.length > 0) {
         result.addAll(enhancedTriesSearch(word));
         int defaultDistance = word.length ~/ 4;
         if (defaultDistance < 1) {
@@ -331,7 +333,7 @@ class SearchNotifier extends ChangeNotifier {
 
   Set<String> kmpSearchStrategy(List<String> words) {
     Set<String> result = Set();
-    if (words == null || words.length == 0) {
+    if (words.length == 0) {
       return getDictionary();
     }
     for (String word in words) {
@@ -348,7 +350,7 @@ class SearchNotifier extends ChangeNotifier {
 
   Set<String> noAlgorithmSearchStrategy(List<String> words) {
     Set<String> result = Set();
-    if (words == null || words.length == 0) {
+    if (words.length == 0) {
       return getDictionary();
     }
     for (String word in words) {
@@ -363,10 +365,10 @@ class SearchNotifier extends ChangeNotifier {
 }
 
 class TreeNode {
-  List<TreeNode> children = List();
-  List<String> intactWord = List();
+  List<TreeNode> children = [];
+  List<String> intactWord = [];
   String val;
-  bool endFlag;
+  bool endFlag = false;
 
   TreeNode(this.val);
 }

@@ -19,6 +19,6 @@ class DailyCodingPage extends StatelessWidget {
             buildDailyCodingCategoryList(context)
                 .map((item) => articleItemToCardItem(item))
                 .toList(),
-            title: MyLocalizations.of(context).dailyCodingTitle());
+            title: MyLocalizations.of(context)!.dailyCodingTitle());
   }
 }

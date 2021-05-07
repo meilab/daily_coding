@@ -22,7 +22,7 @@ class SearchState extends State<SearchMainPage> {
   void initState() {
     _controller.addListener(() {
       setState(() {
-        input = _controller?.text;
+        input = _controller.text;
       });
     });
     super.initState();
@@ -30,17 +30,17 @@ class SearchState extends State<SearchMainPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> textList = List();
+    List<Widget> textList = [];
     // SearchStrategy是搜索关键词匹配策略，
     // 也可以用searchSimilarWords匹配相似单词，用searchWordsInTrie匹配前缀，自己设定参数
     final SearchNotifier searchNotifier = Provider.of<SearchNotifier>(context);
     HashMap<String, ArticleItem> searchMap = searchNotifier.getSearchMap();
     Set<String> result =
         searchNotifier.multiPositionSearchStrategy(input.split(KEY_SPLIT));
-    bufferTitle = List();
+    bufferTitle = [];
     result.forEach((item) {
-      var textItem = SearchPageListItem(searchMap[item]);
-      if (textItem != null) {
+      if (searchMap[item] != null) {
+        SearchPageListItem textItem = SearchPageListItem(searchMap[item]!);
         textList.add(textItem);
       }
     });
@@ -124,5 +124,5 @@ class SearchState extends State<SearchMainPage> {
   }
 
   //多个关键字可能会出现重复的articleItem，用这个list去掉重复的title保证articleItem的唯一性
-  List<String> bufferTitle = List();
+  List<String> bufferTitle = [];
 }

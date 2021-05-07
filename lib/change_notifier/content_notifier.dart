@@ -15,16 +15,16 @@ class ContentNotifier extends ChangeNotifier {
 
   Logger _logger;
   String _markdownData = "";
-  String _markdownCodeString = "";
+  String _markdownCodeString = 'Example code not found';
   String _title = "";
   List<String> _tags = [];
   List<FileModel> _dailyCodinglist = [];
   List<FileModel> _twolanglist = [];
   List<FileModel> _dirs = [];
   List<FileModel> _files = [];
-  ArticleItem _articleItem;
+  late ArticleItem _articleItem;
   bool _loading = false;
-  CardItem _cardItem;
+  late CardItem _cardItem;
   List<CardItem> _cardList = [];
 
   String getMarkdownData() => _markdownData;
@@ -105,9 +105,11 @@ class ContentNotifier extends ChangeNotifier {
     try {
       final Map<String, List<FileModel>> res =
           await _queryRepoDir(Config.DAILY_CODING_PATH);
-      setDailyCodinglist(res["newFiles"]);
-      setFiles(res["newFiles"]);
-      setDirs(res["newDirs"]);
+      if (res["newFiles"] != null && res["newDirs"] != null) {
+        setDailyCodinglist(res["newFiles"]!);
+        setFiles(res["newFiles"]!);
+        setDirs(res["newDirs"]!);
+      }
       setLoading(false);
     } catch (e) {
       _logger.warning("查询编程日课dir list，发生错误：$e");
@@ -120,9 +122,11 @@ class ContentNotifier extends ChangeNotifier {
     try {
       final Map<String, List<FileModel>> res =
           await _queryRepoDir(Config.TWO_LANG_PATH);
-      setTwolanglist(res["newFiles"]);
-      setFiles(res["newFiles"]);
-      setDirs(res["newDirs"]);
+      if (res["newFiles"] != null && res["newDirs"] != null) {
+        setTwolanglist(res["newFiles"]!);
+        setFiles(res["newFiles"]!);
+        setDirs(res["newDirs"]!);
+      }
       setLoading(false);
     } catch (e) {
       _logger.warning("查询程序员2郎dir list，发生错误：$e");
@@ -133,7 +137,7 @@ class ContentNotifier extends ChangeNotifier {
   Future<Map<String, List<FileModel>>> _queryRepoDir(String path) async {
     Response res = await GithubApi.queryRepoDir(path: path);
 
-    if (res != null && res.statusCode == 200) {
+    if (res.statusCode == 200) {
       var data = res.data;
       if (data == null || data.length == 0) {
         // no data;
@@ -159,17 +163,17 @@ class ContentNotifier extends ChangeNotifier {
     try {
       Response res = await GithubApi.queryContentDetail(url);
 
-      if (res != null && res.statusCode == 200) {
+      if (res.statusCode == 200) {
         final String str = res.data;
         final List<String> dataList = str.split("---");
         final String yamlStr = dataList[1];
         final String content = dataList[2];
         var yamlData = loadYaml(yamlStr);
-        // final String title = yamlData['title'];
-        // final List<String> tags = yamlData['tags'];
+        final String title = yamlData['title'];
+        final List<String> tags = yamlData['tags'];
 
-        // setTitle(title);
-        // setTags(tags);
+        setTitle(title);
+        setTags(tags);
         setMarkdownData(content);
       }
 
@@ -180,31 +184,31 @@ class ContentNotifier extends ChangeNotifier {
     }
   }
 
-  Map<String, String> _exampleCode;
-  String _code;
+  String _code = '';
 
-  Future<void> getExampleCode(context, String filePath) async {
+  Future<void> getExampleCode(BuildContext context, String filePath) async {
     final String codeData = await getFile(context, filePath);
     setMarkdownCodeString(codeData);
   }
 
-  Future<void> getContentMd(context, String filePath) async {
+  Future<void> getContentMd(BuildContext context, String filePath) async {
     final String codeData = await getFile(context, filePath);
     setMarkdownData(codeData);
   }
 
-  Future<String> getFile(context, String filePath) async {
-    if (_exampleCode == null) await _parseFile(context, filePath);
+  Future<String> getFile(BuildContext context, String filePath) async {
+    await _parseFile(context, filePath);
     return _code;
   }
 
-  Future<void> _parseFile(context, String filePath) async {
+  Future<void> _parseFile(BuildContext context, String filePath) async {
     String code;
     try {
       code = await rootBundle.loadString(filePath);
+      _code = code;
     } catch (err) {
+      _code = 'Example code not found';
       Navigator.of(context).pop();
     }
-    _code = code;
   }
 }

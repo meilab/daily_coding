@@ -5,19 +5,19 @@ class HotelAppTheme {
   static TextTheme _buildTextTheme(TextTheme base) {
     const String fontName = 'WorkSans';
     return base.copyWith(
-      headline6: base.headline6.copyWith(fontFamily: fontName),
-      bodyText2: base.headline6.copyWith(fontFamily: fontName),
-      bodyText1: base.headline6.copyWith(fontFamily: fontName),
-      button: base.headline6.copyWith(fontFamily: fontName),
-      caption: base.headline6.copyWith(fontFamily: fontName),
-      headline4: base.headline6.copyWith(fontFamily: fontName),
-      // display2: base.headline6.copyWith(fontFamily: fontName),
-      // display3: base.headline6.copyWith(fontFamily: fontName),
-      // display4: base.headline6.copyWith(fontFamily: fontName),
-      headline5: base.headline6.copyWith(fontFamily: fontName),
-      overline: base.headline6.copyWith(fontFamily: fontName),
-      // subhead: base.headline6.copyWith(fontFamily: fontName),
-      subtitle2: base.headline6.copyWith(fontFamily: fontName),
+      headline6: base.headline6?.copyWith(fontFamily: fontName),
+      bodyText2: base.headline6?.copyWith(fontFamily: fontName),
+      bodyText1: base.headline6?.copyWith(fontFamily: fontName),
+      button: base.headline6?.copyWith(fontFamily: fontName),
+      caption: base.headline6?.copyWith(fontFamily: fontName),
+      headline4: base.headline6?.copyWith(fontFamily: fontName),
+      // display2: base.headline6?.copyWith(fontFamily: fontName),
+      // display3: base.headline6?.copyWith(fontFamily: fontName),
+      // display4: base.headline6?.copyWith(fontFamily: fontName),
+      headline5: base.headline6?.copyWith(fontFamily: fontName),
+      overline: base.headline6?.copyWith(fontFamily: fontName),
+      // subhead: base.headline6?.copyWith(fontFamily: fontName),
+      subtitle2: base.headline6?.copyWith(fontFamily: fontName),
     );
   }
 

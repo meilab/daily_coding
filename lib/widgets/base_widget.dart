@@ -22,7 +22,7 @@ class BaseWidget extends StatefulWidget {
 }
 
 class _BaseWidgetState extends State<BaseWidget> {
-  List<String> collects;
+  List<String> collects = [];
   bool collected = false;
 
   @override
@@ -55,7 +55,7 @@ class _BaseWidgetState extends State<BaseWidget> {
             IconButton(
               icon: Icon(collected ? Icons.star : Icons.star_border),
               color: Colors.black54,
-              tooltip: MyLocalizations.of(context).collect(),
+              tooltip: MyLocalizations.of(context)!.collect(),
               onPressed: () {
                 if (mounted) {
                   setState(() {
@@ -72,7 +72,7 @@ class _BaseWidgetState extends State<BaseWidget> {
             IconButton(
               icon: Icon(Icons.code),
               color: Colors.black54,
-              tooltip: MyLocalizations.of(context).reviewCode(),
+              tooltip: MyLocalizations.of(context)!.reviewCode(),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -85,12 +85,11 @@ class _BaseWidgetState extends State<BaseWidget> {
             IconButton(
               icon: Icon(Icons.copy),
               color: Colors.black54,
-              tooltip: MyLocalizations.of(context).click2Copy(),
+              tooltip: MyLocalizations.of(context)!.click2Copy(),
               onPressed: () {
                 final ContentNotifier contentNotifier =
                     Provider.of<ContentNotifier>(context, listen: false);
-                var shareText = contentNotifier.getMarkdownCodeString() ??
-                    'Example code not found';
+                var shareText = contentNotifier.getMarkdownCodeString();
                 Clipboard.setData(ClipboardData(text: shareText));
                 if (isMobile) {
                   Fluttertoast.showToast(
@@ -107,8 +106,7 @@ class _BaseWidgetState extends State<BaseWidget> {
                 onPressed: () {
                   final ContentNotifier contentNotifier =
                       Provider.of<ContentNotifier>(context, listen: false);
-                  var shareText = contentNotifier.getMarkdownCodeString() ??
-                      'Example code not found';
+                  var shareText = contentNotifier.getMarkdownCodeString();
                   Share.share(shareText);
                 },
               ),

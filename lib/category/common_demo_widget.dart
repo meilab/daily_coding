@@ -35,9 +35,9 @@ class CommonDemoWidget extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 24.0),
-                child: Text(MyLocalizations.of(context).dailyCodingPromotion(),
+                child: Text(MyLocalizations.of(context)!.dailyCodingPromotion(),
                     style: theme.textTheme.headline5
-                        .copyWith(color: theme.primaryColor)),
+                        ?.copyWith(color: theme.primaryColor)),
               ),
               SizedBox(height: MyMetrics.baseMargin),
               Image.asset(

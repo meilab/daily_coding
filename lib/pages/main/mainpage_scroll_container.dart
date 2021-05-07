@@ -16,14 +16,14 @@ class MainPageScrollContainer extends StatefulWidget {
 }
 
 class _MainPageScrollContainerState extends State<MainPageScrollContainer> {
-  PageController pageController;
+  late PageController pageController;
   ValueNotifier<double> notifier = ValueNotifier<double>(0);
   int pageIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    final int pageIdx = localStorageManager.getInt('pageIdx') ?? 0;
+    final int pageIdx = localStorageManager.getInt('pageIdx');
     pageController =
         PageController(initialPage: pageIdx, viewportFraction: 0.7);
   }
@@ -53,7 +53,7 @@ class _MainPageScrollContainerState extends State<MainPageScrollContainer> {
         viewportFraction = 0.9;
       }
     }
-    final int pageIdx = localStorageManager.getInt('pageIdx') ?? 0;
+    final int pageIdx = localStorageManager.getInt('pageIdx');
     pageController = PageController(
         initialPage: pageIdx, viewportFraction: viewportFraction);
     super.didChangeDependencies();
@@ -69,38 +69,38 @@ class _MainPageScrollContainerState extends State<MainPageScrollContainer> {
   Widget build(BuildContext context) {
     List<Map> pages = [
       {
-        'title': MyLocalizations.of(context).clangTitle(),
-        'subtitle': MyLocalizations.of(context).clangSubtitle(),
+        'title': MyLocalizations.of(context)!.clangTitle(),
+        'subtitle': MyLocalizations.of(context)!.clangSubtitle(),
         'imgUrl': 'assets/images/widget_bg.png',
         'routeUrl': "/clangContainer",
       },
       {
-        'title': MyLocalizations.of(context).dailyCodingTitle(),
-        'subtitle': MyLocalizations.of(context).dailyCodingSubtitle(),
+        'title': MyLocalizations.of(context)!.dailyCodingTitle(),
+        'subtitle': MyLocalizations.of(context)!.dailyCodingSubtitle(),
         'imgUrl': 'assets/images/backend.jpg',
         'routeUrl': "/dailyCodingContainer",
       },
       {
-        'title': MyLocalizations.of(context).twolangTitle(),
-        'subtitle': MyLocalizations.of(context).twolangSubtitle(),
+        'title': MyLocalizations.of(context)!.twolangTitle(),
+        'subtitle': MyLocalizations.of(context)!.twolangSubtitle(),
         'imgUrl': 'assets/images/widget_bg.png',
         'routeUrl': "/twoLangContainer",
       },
       {
-        'title': MyLocalizations.of(context).flutterTitle(),
-        'subtitle': MyLocalizations.of(context).flutterSubtitle(),
+        'title': MyLocalizations.of(context)!.flutterTitle(),
+        'subtitle': MyLocalizations.of(context)!.flutterSubtitle(),
         'imgUrl': 'assets/images/backend.jpg',
         'routeUrl': "/flutterContainer",
       },
       {
-        'title': MyLocalizations.of(context).scaTitle(),
-        'subtitle': MyLocalizations.of(context).scaSubtitle(),
+        'title': MyLocalizations.of(context)!.scaTitle(),
+        'subtitle': MyLocalizations.of(context)!.scaSubtitle(),
         'imgUrl': 'assets/images/pattern_bg.png',
         'routeUrl': "/scaContainer",
       },
       {
-        'title': MyLocalizations.of(context).reactTitle(),
-        'subtitle': MyLocalizations.of(context).reactSubtitle(),
+        'title': MyLocalizations.of(context)!.reactTitle(),
+        'subtitle': MyLocalizations.of(context)!.reactSubtitle(),
         'imgUrl': 'assets/images/widget_bg.png',
         'routeUrl': "/reactContainer",
       },
@@ -143,7 +143,8 @@ class _MainPageScrollContainerState extends State<MainPageScrollContainer> {
                           ..addListener(() {
                             notifier.value = pageController.offset /
                                 pageController.position.maxScrollExtent;
-                            final int idx = pageController.page.round() % 7;
+                            final int idx =
+                                (pageController.page ?? 0).round() % 7;
                             if (idx != pageIndex) {
                               setState(() {
                                 pageIndex = idx;

@@ -46,7 +46,7 @@ class _AppState extends State<App> {
   void initState() {
     // 需要在initDio之后，因为要到github获取文章数据
     // 需要放在这个frame结束之后执行，否则会报错。
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
+    SchedulerBinding.instance?.addPostFrameCallback((_) async {
       await _fetchArticles();
 
       _initArticlesAndSearchMap();
@@ -61,7 +61,7 @@ class _AppState extends State<App> {
     final SearchNotifier searchNotifier =
         Provider.of<SearchNotifier>(context, listen: false);
 
-    buildClangCategoryList(context).forEach((value) {
+    buildClangCategoryList(context).forEach((ArticleItemCategory value) {
       articleList.addAll(value.list);
     });
     buildScaCategoryList(context).forEach((value) {
@@ -114,7 +114,7 @@ class _AppState extends State<App> {
       SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
     }
     return MaterialApp(
-      // title: MyLocalizations.of(context).dailycoding(),
+      // title: MyLocalizations.of(context)!.dailycoding(),
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

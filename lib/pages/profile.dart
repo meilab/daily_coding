@@ -143,7 +143,9 @@ Row _buildSocialsRow() {
 }
 
 ListTile _buildExperienceRow(
-    {String company, String position, String duration}) {
+    {required String company,
+    required String position,
+    required String duration}) {
   return ListTile(
     leading: Padding(
       padding: const EdgeInsets.only(top: 8.0, left: 20.0),
@@ -219,7 +221,7 @@ Row _buildHeader(BuildContext context) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            MyLocalizations.of(context).author(),
+            MyLocalizations.of(context)!.author(),
             style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10.0),

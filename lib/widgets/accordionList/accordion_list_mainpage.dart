@@ -1,9 +1,6 @@
-import 'package:daily_coding/change_notifier/content_notifier.dart';
 import 'package:daily_coding/pages/feed/feedmainpage.dart';
-import 'package:daily_coding/utils/utils.dart';
 import 'package:daily_coding/model/card_item.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'accordion_list_mainpage_list_item.dart';
 
@@ -18,7 +15,7 @@ class AccordionListMainPage extends StatefulWidget {
 
 class _AccordionListMainPageState extends State<AccordionListMainPage>
     with TickerProviderStateMixin {
-  AnimationController animationController;
+  late AnimationController animationController;
 
   initState() {
     super.initState();

@@ -6,18 +6,18 @@ class EmbedListCategoryArticleListItem extends StatelessWidget {
   final icon;
   final onTap;
   final AnimationController animationController;
-  final Animation<dynamic> animation;
+  final Animation<double> animation;
 
   EmbedListCategoryArticleListItem(
       this.title, this.subtitle, this.icon, this.onTap,
-      {Key key, this.animationController, this.animation})
+      {Key? key, required this.animationController, required this.animation})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
         animation: animationController,
-        builder: (BuildContext context, Widget child) {
+        builder: (BuildContext context, Widget? child) {
           return FadeTransition(
               opacity: animation,
               child: Transform(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:daily_coding/theme/fonts.dart';
+
+import '../theme/fonts.dart';
 
 class BottomSelector extends StatelessWidget {
   final List<dynamic> options;
@@ -9,9 +10,9 @@ class BottomSelector extends StatelessWidget {
   final dynamic onSelected;
 
   BottomSelector(
-      {this.options,
-      this.title,
-      this.optionTitle,
+      {required this.options,
+      required this.title,
+      required this.optionTitle,
       this.curState,
       this.onSelected});
 

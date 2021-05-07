@@ -13,7 +13,7 @@ class _AnimCategoryItemState extends State<AnimCategoryItem> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: widget.categoryBeanItem?.onTap ?? () {},
+      onTap: widget.categoryBeanItem.onTap,
       title: Text(
         widget.categoryBeanItem.title,
         style: TextStyle(color: Colors.white),
@@ -23,7 +23,7 @@ class _AnimCategoryItemState extends State<AnimCategoryItem> {
 }
 
 Widget buildAnimCategoryItem(CategoryBean item) => ListTile(
-      onTap: item?.onTap ?? () {},
+      onTap: item.onTap,
       title: Text(
         item.title,
         style: TextStyle(color: Colors.white),
@@ -34,7 +34,7 @@ class CategoryBean {
   IconData icon;
   String title;
   List<CategoryBean> categoryItems;
-  var onTap;
+  void Function()? onTap;
 
   CategoryBean(this.icon, this.title, this.categoryItems, this.onTap);
 }

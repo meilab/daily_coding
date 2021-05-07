@@ -19,6 +19,6 @@ class TwoLangPage extends StatelessWidget {
             buildTwolangCategoryList(context)
                 .map((item) => articleItemToCardItem(item))
                 .toList(),
-            title: MyLocalizations.of(context).twolangTitle());
+            title: MyLocalizations.of(context)!.twolangTitle());
   }
 }

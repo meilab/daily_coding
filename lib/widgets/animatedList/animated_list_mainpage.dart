@@ -14,7 +14,7 @@ class AnimatedListMainPage extends StatefulWidget {
 
 class _AnimatedListMainPageState extends State<AnimatedListMainPage>
     with TickerProviderStateMixin {
-  AnimationController animationController;
+  late AnimationController animationController;
 
   initState() {
     super.initState();

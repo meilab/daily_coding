@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 class NavigatorManager extends NavigatorObserver {
-  static NavigatorManager navigatorManager;
+  static NavigatorManager? navigatorManager;
   final Logger _logger = Logger('navigatormanager.dart');
 
-  List<Route> routeList = List();
-  StreamController _streamController;
+  List<Route> routeList = [];
+  late StreamController _streamController;
 
   List<Route> get routes => routeList;
 
@@ -17,16 +17,16 @@ class NavigatorManager extends NavigatorObserver {
 
   StreamController get streamController => _streamController;
 
-  static NavigatorManager getInstance() {
+  static NavigatorManager? getInstance() {
     if (navigatorManager == null) {
       navigatorManager = NavigatorManager();
-      navigatorManager._streamController = StreamController.broadcast();
+      navigatorManager?._streamController = StreamController.broadcast();
     }
     return navigatorManager;
   }
 
   pushReplacementNamed(String routeName, WidgetBuilder builder) {
-    return navigator.pushReplacement(
+    return navigator?.pushReplacement(
       MaterialPageRoute(
         builder: builder,
         settings: RouteSettings(name: routeName),
@@ -35,7 +35,7 @@ class NavigatorManager extends NavigatorObserver {
   }
 
   push(String routeName, WidgetBuilder builder) {
-    return navigator.push(
+    return navigator?.push(
       MaterialPageRoute(
         builder: builder,
         settings: RouteSettings(name: routeName),
@@ -44,7 +44,7 @@ class NavigatorManager extends NavigatorObserver {
   }
 
   pushNamed(String routeName, WidgetBuilder builder) {
-    return navigator.push(
+    return navigator?.push(
       MaterialPageRoute(
         builder: builder,
         settings: RouteSettings(name: routeName),
@@ -52,17 +52,17 @@ class NavigatorManager extends NavigatorObserver {
     );
   }
 
-  pop<T extends Object>([T result]) {
-    navigator.pop(result);
+  pop<T extends Object>([T? result]) {
+    navigator?.pop(result);
   }
 
   pushNamedAndRemoveUntil(String newRouteName) {
-    return navigator.pushNamedAndRemoveUntil(
+    return navigator?.pushNamedAndRemoveUntil(
         newRouteName, (Route<dynamic> route) => false);
   }
 
   @override
-  void didPush(Route route, Route previousRoute) {
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPush(route, previousRoute);
     _logger.info('didPush ${route.settings.name}');
     if (route is CupertinoPageRoute || route is MaterialPageRoute) {
@@ -72,18 +72,20 @@ class NavigatorManager extends NavigatorObserver {
   }
 
   @override
-  void didReplace({Route newRoute, Route oldRoute}) {
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     super.didReplace();
-    _logger.info('didReplace ${newRoute.settings.name}');
+    _logger.info('didReplace ${newRoute?.settings.name}');
     if (newRoute is CupertinoPageRoute || newRoute is MaterialPageRoute) {
       routeList.remove(oldRoute);
-      routeList.add(newRoute);
+      if (newRoute != null) {
+        routeList.add(newRoute);
+      }
       updateObserver();
     }
   }
 
   @override
-  void didPop(Route route, Route previousRoute) {
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
     _logger.info('didPop ${route.settings.name}');
     if (route is CupertinoPageRoute || route is MaterialPageRoute) {
@@ -93,7 +95,7 @@ class NavigatorManager extends NavigatorObserver {
   }
 
   @override
-  void didRemove(Route removedRoute, Route oldRoute) {
+  void didRemove(Route<dynamic> removedRoute, Route<dynamic>? oldRoute) {
     super.didRemove(removedRoute, oldRoute);
     _logger.info('didRemove ${removedRoute.settings.name}');
     if (removedRoute is CupertinoPageRoute ||
@@ -111,5 +113,5 @@ class NavigatorManager extends NavigatorObserver {
 class RouteManager {
   static GlobalKey<NavigatorState> navigatorKey = GlobalKey();
 
-  static NavigatorState get instance => navigatorKey.currentState;
+  static NavigatorState? get instance => navigatorKey.currentState;
 }
