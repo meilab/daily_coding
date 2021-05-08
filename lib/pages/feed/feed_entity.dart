@@ -40,7 +40,7 @@ class D {
   });
 
   factory D.fromJson(Map<String, dynamic> jsonRes) {
-    final List<EntryDetail> entrylist =
+    final List<EntryDetail>? entrylist =
         jsonRes['entrylist'] is List ? <EntryDetail>[] : null;
     if (entrylist != null) {
       for (final dynamic item in jsonRes['entrylist']) {
@@ -48,11 +48,14 @@ class D {
           entrylist.add(EntryDetail.fromJson(asT<Map<String, dynamic>>(item)));
         }
       }
+
+      return D(
+        total: asT<int>(jsonRes['total']),
+        entrylist: entrylist,
+      );
+    } else {
+      return D(total: 0, entrylist: []);
     }
-    return D(
-      total: asT<int>(jsonRes['total']),
-      entrylist: entrylist,
-    );
   }
 
   int total;
@@ -108,12 +111,11 @@ class EntryDetail {
   });
 
   factory EntryDetail.fromJson(Map<String, dynamic> jsonRes) {
-    final List<Tags> tags = jsonRes['tags'] is List ? <Tags>[] : null;
-    if (tags != null) {
-      for (final dynamic item in jsonRes['tags']) {
-        if (item != null) {
-          tags.add(Tags.fromJson(asT<Map<String, dynamic>>(item)));
-        }
+    final List<Tags> tags = jsonRes['tags'];
+
+    for (final dynamic item in jsonRes['tags']) {
+      if (item != null) {
+        tags.add(Tags.fromJson(asT<Map<String, dynamic>>(item)));
       }
     }
     return EntryDetail(

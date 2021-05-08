@@ -135,7 +135,7 @@ class _AppState extends State<App> {
         return MaterialPageRoute(builder: (context) => NotFoundWidget());
       },
       navigatorKey: RouteManager.navigatorKey,
-      navigatorObservers: [NavigatorManager.getInstance()],
+      navigatorObservers: [NavigatorManager.getInstance()!],
     );
   }
 }

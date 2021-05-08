@@ -33,7 +33,10 @@ class _RenderCodeWidgetState extends State<RenderCodeWidget> {
         child: RichText(
           text: TextSpan(
             style: const TextStyle(fontFamily: 'monospace', fontSize: 16.0),
-            children: <TextSpan>[DartSyntaxHighlighter().format(showSource)],
+            children: <TextSpan>[
+              DartSyntaxHighlighter(SyntaxHighlighterStyle.defaultStyle())
+                  .format(showSource)
+            ],
           ),
         ),
       );
