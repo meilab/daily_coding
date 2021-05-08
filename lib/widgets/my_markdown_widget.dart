@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:logging/logging.dart';
 import 'package:daily_coding/theme/colors.dart';
 import 'package:daily_coding/theme/fonts.dart';
 import 'package:daily_coding/widgets/syntax_high_lighter.dart';
-import 'package:logging/logging.dart';
+
+Logger _logger = Logger('my_markdown_widget.dart');
 
 class MyMarkdownWidget extends StatelessWidget {
   static const int DARK_WHITE = 0;
@@ -15,8 +17,6 @@ class MyMarkdownWidget extends StatelessWidget {
   final String markdownData;
 
   final int style;
-
-  final Logger _logger = Logger('MyMarkdownWidget.dart');
 
   MyMarkdownWidget({this.markdownData = "", this.style = DARK_WHITE});
 
@@ -118,9 +118,9 @@ class MyMarkdownWidget extends StatelessWidget {
     String mdDataCode = markdownData;
     try {
       Iterable<Match> tags = exp.allMatches(markdownData);
-      if (tags != null && tags.length > 0) {
+      if (tags.length > 0) {
         for (Match m in tags) {
-          String imageMatch = m.group(0);
+          String? imageMatch = m.group(0);
           if (imageMatch != null && !imageMatch.contains(".svg")) {
             String match = imageMatch.replaceAll("\)", "?raw=true)");
             if (!match.contains(".svg") && match.contains("http")) {
@@ -133,21 +133,21 @@ class MyMarkdownWidget extends StatelessWidget {
             } else {
               match = "";
             }
-            mdDataCode = mdDataCode.replaceAll(m.group(0), match);
+            mdDataCode = mdDataCode.replaceAll(m.group(0)!, match);
           }
         }
       }
 
       ///优化img标签的src资源
       tags = expImg.allMatches(markdownData);
-      if (tags != null && tags.length > 0) {
+      if (tags.length > 0) {
         for (Match m in tags) {
-          String imageTag = m.group(0);
-          String match = imageTag;
+          String? imageTag = m.group(0);
+          String? match = imageTag;
           if (imageTag != null) {
             Iterable<Match> srcTags = expSrc.allMatches(imageTag);
             for (Match srcMatch in srcTags) {
-              String srcString = srcMatch.group(0);
+              String? srcString = srcMatch.group(0);
               if (srcString != null && srcString.contains("http")) {
                 String newSrc = srcString.substring(
                         srcString.indexOf("http"), srcString.length - 1) +
@@ -158,7 +158,9 @@ class MyMarkdownWidget extends StatelessWidget {
               }
             }
           }
-          mdDataCode = mdDataCode.replaceAll(imageTag, match);
+          if (imageTag != null && match != null) {
+            mdDataCode = mdDataCode.replaceAll(imageTag, match);
+          }
         }
       }
     } catch (e) {
@@ -177,7 +179,7 @@ class MyMarkdownWidget extends StatelessWidget {
           styleSheet: _getStyle(context),
           syntaxHighlighter: Highlighter(),
           data: _getMarkDownData(markdownData),
-          onTapLink: (String source) {
+          onTapLink: (String source, String? a, String? b) {
             // launchInternalUrl(context, source);
           },
         ),
@@ -191,6 +193,7 @@ class Highlighter extends SyntaxHighlighter {
   TextSpan format(String source) {
     String showSource = source.replaceAll("&lt;", "<");
     showSource = showSource.replaceAll("&gt;", ">");
-    return DartSyntaxHighlighter().format(showSource);
+    return DartSyntaxHighlighter(SyntaxHighlighterStyle.defaultStyle())
+        .format(showSource);
   }
 }

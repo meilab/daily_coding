@@ -2,16 +2,18 @@ import 'package:logging/logging.dart';
 import 'package:string_scanner/string_scanner.dart';
 import 'package:flutter/material.dart';
 
+Logger _logger = Logger('syntax_high_lighter.dart');
+
 class SyntaxHighlighterStyle {
   SyntaxHighlighterStyle(
-      {this.baseStyle,
-      this.numberStyle,
-      this.commentStyle,
-      this.keywordStyle,
-      this.stringStyle,
-      this.punctuationStyle,
-      this.classStyle,
-      this.constantStyle});
+      {required this.baseStyle,
+      required this.numberStyle,
+      required this.commentStyle,
+      required this.keywordStyle,
+      required this.stringStyle,
+      required this.punctuationStyle,
+      required this.classStyle,
+      required this.constantStyle});
 //123
   static SyntaxHighlighterStyle defaultStyle() {
     return new SyntaxHighlighterStyle(
@@ -41,11 +43,8 @@ abstract class SyntaxCostomHighlighter {
 }
 
 class DartSyntaxHighlighter extends SyntaxCostomHighlighter {
-  final Logger _logger = Logger('dartSyntaxHighlighter.dart');
-  DartSyntaxHighlighter([this._style]) {
+  DartSyntaxHighlighter(this._style) {
     _spans = <_HighlightSpan>[];
-
-    if (_style == null) _style = SyntaxHighlighterStyle.defaultStyle();
   }
 
   SyntaxHighlighterStyle _style;
@@ -132,10 +131,10 @@ class DartSyntaxHighlighter extends SyntaxCostomHighlighter {
     'bool'
   ];
 
-  String _src;
-  StringScanner _scanner;
+  late String _src;
+  late StringScanner _scanner;
 
-  List<_HighlightSpan> _spans;
+  List<_HighlightSpan> _spans = [];
 
   TextSpan format(String src) {
     _src = src;
@@ -178,40 +177,44 @@ class DartSyntaxHighlighter extends SyntaxCostomHighlighter {
 
         // Block comments
         if (_scanner.scan(new RegExp(r"/\*(.|\n)*\*/"))) {
-          _spans.add(new _HighlightSpan(_HighlightType.comment,
-              _scanner.lastMatch.start, _scanner.lastMatch.end));
+          if (_scanner.lastMatch?.start != null &&
+              _scanner.lastMatch?.end != null)
+            _spans.add(new _HighlightSpan(_HighlightType.comment,
+                _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           continue;
         }
 
         // Line comments
         if (_scanner.scan("//")) {
-          int startComment = _scanner.lastMatch.start;
+          if (_scanner.lastMatch?.start != null) {
+            int startComment = _scanner.lastMatch?.start ?? 0;
 
-          bool eof = false;
-          int endComment;
-          if (_scanner.scan(new RegExp(r".*\n"))) {
-            endComment = _scanner.lastMatch.end - 1;
-          } else {
-            eof = true;
-            endComment = _src.length;
+            bool eof = false;
+            int endComment;
+            if (_scanner.scan(new RegExp(r".*\n"))) {
+              endComment = _scanner.lastMatch!.end - 1;
+            } else {
+              eof = true;
+              endComment = _src.length;
+            }
+
+            _spans.add(new _HighlightSpan(
+                _HighlightType.comment, startComment, endComment));
+
+            if (eof) break;
+
+            continue;
           }
-
-          _spans.add(new _HighlightSpan(
-              _HighlightType.comment, startComment, endComment));
-
-          if (eof) break;
-
-          continue;
         }
 
         if (_scanner.scan("#")) {
-          int startComment = _scanner.lastMatch.start;
+          int startComment = _scanner.lastMatch!.start;
 
           bool eof = false;
           int endComment;
 
           if (_scanner.scan(new RegExp(r".*\n"))) {
-            endComment = _scanner.lastMatch.end - 1;
+            endComment = _scanner.lastMatch!.end - 1;
           } else {
             eof = true;
             endComment = _src.length;
@@ -227,85 +230,85 @@ class DartSyntaxHighlighter extends SyntaxCostomHighlighter {
         // Raw r"String"
         if (_scanner.scan(new RegExp(r'r".*"'))) {
           _spans.add(new _HighlightSpan(_HighlightType.string,
-              _scanner.lastMatch.start, _scanner.lastMatch.end));
+              _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           continue;
         }
 
         // Raw r'String'
         if (_scanner.scan(new RegExp(r"r'.*'"))) {
           _spans.add(new _HighlightSpan(_HighlightType.string,
-              _scanner.lastMatch.start, _scanner.lastMatch.end));
+              _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           continue;
         }
 
         // Multiline """String"""
         if (_scanner.scan(new RegExp(r'"""(?:[^"\\]|\\(.|\n))*"""'))) {
           _spans.add(new _HighlightSpan(_HighlightType.string,
-              _scanner.lastMatch.start, _scanner.lastMatch.end));
+              _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           continue;
         }
 
         // Multiline '''String'''
         if (_scanner.scan(new RegExp(r"'''(?:[^'\\]|\\(.|\n))*'''"))) {
           _spans.add(new _HighlightSpan(_HighlightType.string,
-              _scanner.lastMatch.start, _scanner.lastMatch.end));
+              _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           continue;
         }
 
         // "String"
         if (_scanner.scan(new RegExp(r'"(?:[^"\\]|\\.)*"'))) {
           _spans.add(new _HighlightSpan(_HighlightType.string,
-              _scanner.lastMatch.start, _scanner.lastMatch.end));
+              _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           continue;
         }
 
         // 'String'
         if (_scanner.scan(new RegExp(r"'(?:[^'\\]|\\.)*'"))) {
           _spans.add(new _HighlightSpan(_HighlightType.string,
-              _scanner.lastMatch.start, _scanner.lastMatch.end));
+              _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           continue;
         }
 
         // Double
         if (_scanner.scan(new RegExp(r"\d+\.\d+"))) {
           _spans.add(new _HighlightSpan(_HighlightType.number,
-              _scanner.lastMatch.start, _scanner.lastMatch.end));
+              _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           continue;
         }
 
         // Integer
         if (_scanner.scan(new RegExp(r"\d+"))) {
           _spans.add(new _HighlightSpan(_HighlightType.number,
-              _scanner.lastMatch.start, _scanner.lastMatch.end));
+              _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           continue;
         }
 
         // Punctuation
         if (_scanner.scan(new RegExp(r"[\[\]{}().!=<>&\|\?\+\-\*/%\^~;:,]"))) {
           _spans.add(new _HighlightSpan(_HighlightType.punctuation,
-              _scanner.lastMatch.start, _scanner.lastMatch.end));
+              _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           continue;
         }
 
         //中文
         if (_scanner.scan(new RegExp(r"[\u4e00-\u9fa5]"))) {
           _spans.add(new _HighlightSpan(_HighlightType.punctuation,
-              _scanner.lastMatch.start, _scanner.lastMatch.end));
+              _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           continue;
         }
 
         // Metadata
         if (_scanner.scan(new RegExp(r"@\w+"))) {
           _spans.add(new _HighlightSpan(_HighlightType.keyword,
-              _scanner.lastMatch.start, _scanner.lastMatch.end));
+              _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           continue;
         }
 
         // Words
         if (_scanner.scan(new RegExp(r"\w+"))) {
-          _HighlightType type;
+          _HighlightType? type;
 
-          String word = _scanner.lastMatch[0];
+          String word = _scanner.lastMatch![0]!;
           if (word.startsWith("_")) word = word.substring(1);
 
           if (_kKeywords.contains(word))
@@ -321,7 +324,7 @@ class DartSyntaxHighlighter extends SyntaxCostomHighlighter {
 
           if (type != null) {
             _spans.add(new _HighlightSpan(
-                type, _scanner.lastMatch.start, _scanner.lastMatch.end));
+                type, _scanner.lastMatch!.start, _scanner.lastMatch!.end));
           }
         }
 
