@@ -7,6 +7,7 @@ class ArticleItem {
     required this.subtitle,
     this.routeName = '',
     this.keyword = '',
+    this.imgUrl = 'assets/images/widget_bg.png',
     required this.onTap,
   });
 
@@ -14,6 +15,7 @@ class ArticleItem {
   final IconData icon;
   final String subtitle;
   final String routeName;
+  final String imgUrl;
   final String keyword;
   final void Function() onTap;
 

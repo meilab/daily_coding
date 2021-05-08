@@ -10,6 +10,21 @@ import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:yaml/yaml.dart';
 
+ArticleItem dummyArticle = ArticleItem(
+  icon: Icons.accessibility,
+  title: '',
+  subtitle: '',
+  keyword: 'HelloWorld',
+  onTap: () {},
+);
+CardItem dummyCardItem = CardItem(
+  icon: Icons.accessibility,
+  title: '',
+  subtitle: '',
+  imgUrl: '',
+  onTap: () {},
+);
+
 class ContentNotifier extends ChangeNotifier {
   ContentNotifier() : _logger = Logger('seafile_notifier.dart');
 
@@ -22,9 +37,9 @@ class ContentNotifier extends ChangeNotifier {
   List<FileModel> _twolanglist = [];
   List<FileModel> _dirs = [];
   List<FileModel> _files = [];
-  late ArticleItem _articleItem;
+  ArticleItem _articleItem = dummyArticle;
   bool _loading = false;
-  late CardItem _cardItem;
+  CardItem _cardItem = dummyCardItem;
   List<CardItem> _cardList = [];
 
   String getMarkdownData() => _markdownData;
