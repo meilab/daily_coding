@@ -15,7 +15,7 @@ class _AnimCategoryContainerState extends State<AnimCategoryContainer>
   late bool isExpanded;
   late AnimationController controller;
   late Animation<EdgeInsetsGeometry> marginAnim;
-  late Animation<BorderRadius> radiusAnim;
+  late Animation<BorderRadius?> radiusAnim;
 
   @override
   void initState() {
@@ -44,7 +44,7 @@ class _AnimCategoryContainerState extends State<AnimCategoryContainer>
     List<Widget> listItems = widget.categoryBean.categoryItems
         .map(buildAnimCategoryItem)
         .toList()
-          ..add(SizedBox(height: 12));
+      ..add(SizedBox(height: 12));
 
     return AnimatedBuilder(
       animation: controller,
@@ -53,7 +53,7 @@ class _AnimCategoryContainerState extends State<AnimCategoryContainer>
           margin: marginAnim.value,
           child: Material(
             shape: RoundedRectangleBorder(
-              borderRadius: radiusAnim.value,
+              borderRadius: radiusAnim.value ?? BorderRadius.zero,
             ),
             color: Colors.cyan.shade700,
             clipBehavior: Clip.antiAlias,
